@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LibraryOS — Circulation &amp; Digital Resource Management</title>
+  <meta name="description" content="Library Circulation and Digital Resource Management System — manage books, members, issues, returns, reservations and fines.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<!-- ── TOAST CONTAINER ─────────────────────────────────── -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ── MODAL ──────────────────────────────────────────── -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOverlay(event)">
+  <div class="modal" id="modalBox">
+    <div class="modal-header">
+      <span class="modal-title" id="modalTitle">—</span>
+      <button class="modal-close" onclick="closeModal()"><i class="fa fa-times"></i></button>
+    </div>
+    <div class="modal-body"   id="modalBody"></div>
+    <div class="modal-footer" id="modalFooter"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     AUTH SCREEN
+     ═══════════════════════════════════════════════════════ -->
+<div id="auth-screen">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="logo-icon-wrap">📚</div>
+      <span class="logo-text-wrap">LibraryOS</span>
+    </div>
+
+    <div class="auth-tab-bar">
+      <button class="auth-tab active" id="tabLogin"    onclick="switchAuthTab('login')">Sign In</button>
+      <button class="auth-tab"        id="tabRegister" onclick="switchAuthTab('register')">Register</button>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="loginForm">
+      <h2 class="auth-title">Welcome back</h2>
+      <p class="auth-subtitle">Sign in to your library account</p>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="form-control" type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-control" type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <button class="btn btn-primary btn-full" style="margin-top:6px;" onclick="handleLogin()">
+        <i class="fa fa-sign-in-alt"></i> Sign In
+      </button>
+      <div class="demo-hint">
+        <strong>Admin:</strong> admin@library.com / admin123<br>
+        <strong>Student:</strong> student1@library.com / pass123
+      </div>
+    </div>
+
+    <!-- REGISTER -->
+    <div id="registerForm" style="display:none;">
+      <h2 class="auth-title">Join the Library</h2>
+      <p class="auth-subtitle">Create your member account</p>
+      <div class="form-group">
+        <label class="form-label">Full Name</label>
+        <input class="form-control" id="regName" placeholder="Your full name">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="form-control" type="email" id="regEmail" placeholder="you@example.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Member Code</label>
+        <input class="form-control" id="regCode" placeholder="e.g. MEM2025001">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password (min 8 chars)</label>
+        <input class="form-control" type="password" id="regPassword" placeholder="••••••••">
+      </div>
+      <button class="btn btn-primary btn-full" style="margin-top:6px;" onclick="handleRegister()">
+        <i class="fa fa-user-plus"></i> Create Account
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     MAIN APP
+     ═══════════════════════════════════════════════════════ -->
+<div id="main-screen">
+
+  <!-- Sidebar overlay (mobile) -->
+  <div class="sb-overlay" id="sbOverlay" onclick="toggleSidebar()"></div>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-icon">📚</div>
+      <div>
+        <div class="sb-logo-name">LibraryOS</div>
+        <div style="font-size:9px;color:var(--text-faint);">v1.0</div>
+      </div>
+    </div>
+
+    <div class="sb-role-label" id="sidebarRoleLabel">ADMIN PORTAL</div>
+    <nav class="sb-nav" id="sidebarNav"></nav>
+
+    <div class="sb-footer">
+      <div class="user-info-block">
+        <div class="user-avatar" id="sidebarAvatar">A</div>
+        <div>
+          <div class="user-name" id="sidebarName">Admin</div>
+          <div class="user-role-text" id="sidebarRoleText">Administrator</div>
+        </div>
+      </div>
+      <button class="btn btn-ghost btn-full btn-sm" onclick="handleLogout()">
+        <i class="fa fa-sign-out-alt"></i> Sign Out
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="menu-btn" onclick="toggleSidebar()"><i class="fa fa-bars"></i></button>
+        <div>
+          <div class="topbar-title" id="pageTitle">Dashboard</div>
+          <div class="topbar-sub"   id="pageSub">Library Management System</div>
+        </div>
+      </div>
+      <div class="topbar-date" id="topbarDate"></div>
+    </div>
+
+    <div class="page-content" id="viewContent">
+      <!-- Dynamic content injected here -->
+    </div>
+  </main>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
